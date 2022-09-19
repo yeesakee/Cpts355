@@ -50,16 +50,16 @@ split c iL = splitHelper c iL []
 
 -- 6. nSplit
 
--- unfortunately isn't working :(
--- nSplit :: [a] -> t -> [a] -> [[a]]
+--unfortunately isn't working :(
+nSplit :: [a] -> t -> [a] -> [[a]]
 
--- nSplit c n [] = [[]]
--- nSplit c n iL = nSplitHelper c n iL []
---      where
---           nSplitHelper:: [a] -> t -> [a] -> [a] -> [[a]]
---           nSplitHelper c n [] [] = [[]]
---           nSplitHelper c n [] buff = [reverse buff]
---           nSplitHelper c n (x:xs) buff | (n < 0) = (reverse buff:(x:xs))
---                                        | (x == c) = (reverse buff):nSplitHelper c (n-1) xs []
---                                        | otherwise = nSplitHelper c n xs (x:buff)
+nSplit c n [] = [[]]
+nSplit c n iL = nSplitHelper c n iL []
+     where
+          nSplitHelper :: [a] -> t -> [a] -> [a] -> [[a]]
+          nSplitHelper c n [] [] = [[]]
+          nSplitHelper c n [] buff = [reverse buff]
+          nSplitHelper c n (x:xs) buff | (n < 0) = (reverse buff):(x:xs)
+                                       | (x == c) = (reverse buff):nSplitHelper c (n-1) xs []
+                                       | otherwise = nSplitHelper c n xs (x:[buff])
 

@@ -99,14 +99,26 @@ game_scores_test3 = TestCase (assertEqual "game_scores_test3"
                                   (sort $ game_scores wsu_games "UTAH") ) 
 
 
-wins_by_year_test1 = TestCase (assertEqual "wins_by_year_test1" 
-                                  []  
-                                  (sort $ wins_by_year []) )  
+-- wins_by_year_test1 = TestCase (assertEqual "wins_by_year_test1" 
+--                                   []  
+--                                   (sort $ wins_by_year []) )  
 wins_by_year_test2 = TestCase (assertEqual "wins_by_year_test2" 
                                   (sort [(2019,6),(2020,1),(2021,7)])  
                                   (sort $ wins_by_year wsu_games) )                   
 -- P5. compress_str tests
 
+compress_str_test1 = TestCase (assertEqual "(compress_str_test1)" 
+                                  "" 
+                                  (compress_str "") ) 
+compress_str_test2 = TestCase (assertEqual "(compress_str_test2)" 
+                                  "a"
+                                  (compress_str "a") )                             
+compress_str_test3 = TestCase (assertEqual "(compress_str_test3)" 
+                                  "a3b3cdef2g"
+                                  (compress_str "aaabbbcdeffg") )     
+compress_str_test4 = TestCase (assertEqual "(compress_str_test4)" 
+                                  "ab3cdef2g3"
+                                  (compress_str "abbbcdeffggg") )    
 
 -- add the test cases you created to the below list. 
 tests = TestList [ --TestLabel "merge_sorted- test1 " merge_sorted_test1,
@@ -136,8 +148,13 @@ tests = TestList [ --TestLabel "merge_sorted- test1 " merge_sorted_test1,
                    TestLabel "game_scores- test2 " game_scores_test2, 
                    TestLabel "game_scores- test3 " game_scores_test3,
                    
-                   TestLabel "wins_by_year- test1 " game_scores_test1,
-                   TestLabel "wins_by_year- test2 " game_scores_test2
+                   --TestLabel "wins_by_year- test1 " game_scores_test1,
+                   TestLabel "wins_by_year- test2 " game_scores_test2,
+
+                   TestLabel "compress_str- test1" compress_str_test1,
+                   TestLabel "compress_str- test2" compress_str_test2,
+                   TestLabel "compress_str- test3" compress_str_test3,
+                   TestLabel "compress_str- test4" compress_str_test4
                  ] 
                   
 -- shortcut to run the tests

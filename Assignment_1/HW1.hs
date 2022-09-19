@@ -10,6 +10,8 @@
 
 module HW1
      where
+import Distribution.Simple.Utils (xargs)
+import Data.Char (digitToInt, intToDigit)
 
 -- P1 - merge_sorted 10%
 -- merge_sorted: takes two sorted lists and returns a sorted merged list
@@ -118,6 +120,26 @@ wins_by_year (x:xs) = (fst(x), wins_by_year_helper x) : wins_by_year xs
 
 
 -- P5  compress_str ; 15% 
+-- compress_str: takes a list of Char and returns a list of Char
+--               compresses the given list by replacing repeating characters
+--               in the format: char#repeated (example: aaabbc -> a3b2c)
+compress_str :: [Char] -> [Char]
+compress_str [] = []
+compress_str (x:xs) = compress_str_helper xs x 1
+     where 
+          -- compress_str_helper: takes a list of Char, a Char prev_char that stores the last
+          --                      observed character, an Int count that counts the number of
+          --                      times that char has repeated, and returns the compressed list
+          compress_str_helper :: [Char] -> Char -> Int -> [Char]
+          -- base case: if list is empty and count is 1, return just the char
+          compress_str_helper [] prev_char 1 = [prev_char]
+          -- base case: if list is empty and count > 1 then return the format char#repeated
+          compress_str_helper [] prev_char count = (prev_char:[intToDigit(count)])
+          compress_str_helper (x:xs) prev_char count
+               | prev_char == x = compress_str_helper xs prev_char (count+1)    -- character still repeating
+               | count == 1 = prev_char:compress_str_helper xs x 1    -- character only showed once
+               -- add to list in format char#repeated and call function again
+               | otherwise = (prev_char:[intToDigit(count)]) ++ compress_str_helper xs x 1
 
 
 
