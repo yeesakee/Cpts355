@@ -6,6 +6,7 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 {-# HLINT ignore "Redundant bracket" #-}
 {-# HLINT ignore "Use even" #-}
+{-# HLINT ignore "Use uncurry" #-}
 
 module HW1
      where
@@ -26,8 +27,9 @@ sum_range :: (Ord a, Num p, Num a) => (a, a) -> [p] -> p
 sum_range (a,b) [] = 0   -- base case: if list is empty return 0
 sum_range tp iL = sum_range_helper tp iL 0
      where
-          sum_range_helper (a,b) (x:xs) index 
-               | (index >= a && index < b) = x + sum_range_helper (a,b) (xs) (index+1)   -- if current index is in the given interval add x at index to sum
+          sum_range_helper (a,b) (x:xs) index
+                -- if current index is in the given interval add x at index to sum
+               | (index >= a && index < b) = x + sum_range_helper (a,b) (xs) (index+1)
                | (index == b) = x    -- if index is the last interval then just return x
                | otherwise = sum_range_helper (a,b) (xs) (index+1)   -- otherwise call function again with index + 1
 
@@ -37,15 +39,17 @@ calc_collatz_seq :: Integral a => a -> [a]
 calc_collatz_seq 0 = [1]    -- base case: if num is 0 return [1]
 calc_collatz_seq 1 = [1]    -- base case: if num is 1 return [1]
 calc_collatz_seq num
-     | (num `mod` 2 == 0) = num:calc_collatz_seq (num `div` 2)    -- if num is even then concat num and call function with num/2
-     | otherwise = num:calc_collatz_seq (3 * num + 1)   -- otherwise concat num and call function with 3 * num + 1
+     -- if num is even then concat num and call function with num/2
+     | (num `mod` 2 == 0) = num:calc_collatz_seq (num `div` 2)
+     -- otherwise concat num and call function with 3 * num + 1
+     | otherwise = num:calc_collatz_seq (3 * num + 1)
 
 -- P3  (b) longest_collatz_seq ; 15%
 -- longest_collatz_seq: takes an integer and returns a list of integers
 longest_collatz_seq :: Integral a => a -> [a]
 longest_collatz_seq 0 = [1]    -- base case: if num is 0 return [1]
 longest_collatz_seq 1 = [1]    -- base case: if num is 1 return [1]
-longest_collatz_seq num = 
+longest_collatz_seq num =
      longest_collatz_seq_helper (calc_collatz_seq num) (calc_collatz_seq (num-1)) num (num-1)
      where
           -- takes two lists, xL and yL, and compares the length of the lists
@@ -56,18 +60,61 @@ longest_collatz_seq num =
           longest_collatz_seq_helper [] [] xnum ynum = []    -- base case: if both lists are empty return empty list
           longest_collatz_seq_helper xL [] xnum ynum = xL    -- base case: if second list is empty return first list xL
           longest_collatz_seq_helper [] yL xnum ynum = yL    -- base case: if first list is empty return second list yL
-          longest_collatz_seq_helper xL yL xnum ynum 
-               | length(xL) >= length(yL) = -- if length of list xL is longer or equal to yL
-                    if ynum <= 0 then xL    -- if ynum is less than or equal to 0 then just return xL (no more nums to check)
-                    else longest_collatz_seq_helper xL (calc_collatz_seq (ynum-1)) xnum (ynum-1)    -- call function again, with xL as the longest list
-               | otherwise =     -- if length of yL is longer than xL
-                    if ynum <= 0 then yL    -- if ynum is less than or equal to 0 then just return yL (no more nums to check)
-                    else longest_collatz_seq_helper yL (calc_collatz_seq (ynum - 1)) ynum (ynum-1)    -- call function again, with yL as the longest list
+          longest_collatz_seq_helper xL yL xnum ynum
+               | length(xL) >= length(yL) =
+                    if ynum <= 0 then xL    -- no more numbers to check
+                    -- call function again, with xL as the longest list
+                    else longest_collatz_seq_helper xL (calc_collatz_seq (ynum-1)) xnum (ynum-1)
+               | otherwise =
+                    if ynum <= 0 then yL    -- no more numbers to check
+                     -- call function again, with yL as the longest list
+                    else longest_collatz_seq_helper yL (calc_collatz_seq (ynum - 1)) ynum (ynum-1)
 
 -- P4  (a) game_scores ; 15%
-
+-- game_scores: takes a list of tuples and opponent school's name.
+--              tuple format: (year, [school, (tuple of score)])
+--              (tuple of score) format: (school's score, opponent school's score)
+--              example list: wsu_games = [(2019, [("NMSU",(58,7)), ("UNCO",(59,17))]
+--              returns all the scores played against the given school
+game_scores :: Eq t => [(a1, [(t, a2)])] -> t -> [a2]
+game_scores [] target_school = []    -- base case: if list is empty return empty list
+game_scores (x:xs) target_school =
+     -- call game_scores_by_year and concat game_scores of the rest of the list
+     game_scores_by_year x target_school ++ game_scores xs target_school
+     where
+          -- game_scores_by_year: takes a tuple and the opponent school's name
+          -- tuple format: year, and tuple (x:xs)
+          -- first element of x (fst(x)) is name of school, second element of x (snd(x)) is score of game
+          -- returns the scores played against the given school
+          game_scores_by_year :: Eq t => (a1, [(t, a2)]) -> t -> [a2]
+          game_scores_by_year (a,[]) target_school = []
+          game_scores_by_year (year, (x:xs)) target_school
+               -- if fst(x) is the target school, concat snd(x) and call function again with xs
+               | (fst(x) == target_school) = snd(x):game_scores_by_year (year, xs) target_school
+               | otherwise = game_scores_by_year (year, xs) target_school -- otherwise call function again with xs
 
 -- P4  (b) wins_by_year ; 10%
+-- wins_by_year: takes a list of tuples
+--               tuple format: (year, [school, (tuple of score)])
+--               (tuple of score) format: (school's score, opponent school's score)
+--               example list: wsu_games = [(2019, [("NMSU",(58,7)), ("UNCO",(59,17))]
+--               returns a list of tuples in the format: [(year, # wins)]
+wins_by_year :: (Num b, Ord a1) => [(a2, [(a3, (a1, a1))])] -> [(a2, b)]
+wins_by_year [] = []     -- base case: if list is empty return empty list
+wins_by_year (x:xs) = (fst(x), wins_by_year_helper x) : wins_by_year xs
+     where
+          -- wins_by_year_helper: takes a tuple
+          -- tuple format: year, and tuple (x:xs)
+          -- first element of x (fst(x)) is name of school, second element of x (snd(x)) is score of game
+          -- returns the scores played against the given school
+
+          -- ====== how to write wins_by_year_helper ::========
+          wins_by_year_helper (a,[]) = 0
+          wins_by_year_helper (year, (x:xs))
+               -- get school's score fst(snd(x)) (snd(x) stores the (school's score, oppoenent's score))
+               -- fst(snd(x)) gives school's score snd(snd(x)) gives opponent's score
+               | (fst(snd(x)) > snd(snd(x))) = 1 + wins_by_year_helper (year, xs)
+               | otherwise = wins_by_year_helper (year, xs)
 
 
 -- P5  compress_str ; 15% 

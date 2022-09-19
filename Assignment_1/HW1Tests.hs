@@ -1,5 +1,7 @@
 {- Example of using the HUnit unit test framework.  See  http://hackage.haskell.org/package/HUnit for additional documentation.
 To run the tests type "run" at the Haskell prompt.  -} 
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use camelCase" #-}
 
 module HW1Tests
     where
@@ -8,7 +10,7 @@ import Test.HUnit
 import Data.Char
 import Data.List (sort)
 import HW1
-import HW1 (merge_sorted)
+import HW1 (merge_sorted, wins_by_year)
 
 -- P1. merge_sorted tests
 -- merge_sorted_test1 = TestCase (assertEqual "merge_sorted_test1"
@@ -76,8 +78,33 @@ longest_collatz_seq_test4 = TestCase (assertEqual "longest_collatz_seq4"
                                   (longest_collatz_seq 100) )
 
 -- P4. (a) game_scores and (b) wins_by_year tests  (one test is sufficient for wins_by_year)                                
+wsu_games = [
+    (2019, [("NMSU",(58,7)), ("UNCO",(59,17)), ("HOU",(31,24)), ("UCLA",(63,67)), ("UTAH",(13,38)), 
+            ("ASU",(34,38)), ("COLO",(41,10)), ("ORE",(35,37)), ("CAL",(20,33)), ("STAN",(49,22)), 
+            ("ORST",(54,53)), ("WASH",(13,31)), ("AFA",(21,31))]),
+    (2020, [("ORST",(38,28)), ("ORE",(29,43)), ("USC",(13,38)), ("UTAH",(28,45))]),
+    (2021, [("USU",(23,26)), ("PORT ST.",(44,24)), ("USC",(14,45)), ("UTAH",(13,24)), ("CAL",(21,6)),
+            ("ORST",(31,24)), ("STAN",(34,31)), ("BYU",(19,21)), ("ASU",(34,21)), ("ORE",(24,38)), 
+            ("ARIZ",(44,18)), ("WASH",(40,13)), ("CMU",(21,24))] )
+            ]
+            
+game_scores_test1 = TestCase (assertEqual "game_scores_test1" 
+                                  []
+                                  (sort $ game_scores wsu_games "BERKLEY") ) 
+game_scores_test2 = TestCase (assertEqual "game_scores_test2" 
+                                  (sort [(63,67)]) 
+                                  (sort $ game_scores wsu_games "UCLA") ) 
+game_scores_test3 = TestCase (assertEqual "game_scores_test3" 
+                                  (sort [(13,38),(28,45),(13,24)])
+                                  (sort $ game_scores wsu_games "UTAH") ) 
 
-                                                           
+
+wins_by_year_test1 = TestCase (assertEqual "wins_by_year_test1" 
+                                  []  
+                                  (sort $ wins_by_year []) )  
+wins_by_year_test2 = TestCase (assertEqual "wins_by_year_test2" 
+                                  (sort [(2019,6),(2020,1),(2021,7)])  
+                                  (sort $ wins_by_year wsu_games) )                   
 -- P5. compress_str tests
 
 
@@ -103,7 +130,14 @@ tests = TestList [ --TestLabel "merge_sorted- test1 " merge_sorted_test1,
                    TestLabel "longest_collatz_seq- test1 " longest_collatz_seq_test1, 
                    TestLabel "longest_collatz_seq- test2 " longest_collatz_seq_test2, 
                    TestLabel "longest_collatz_seq- test3 " longest_collatz_seq_test3,
-                   TestLabel "longest_collatz_seq- test4 " longest_collatz_seq_test1
+                   TestLabel "longest_collatz_seq- test4 " longest_collatz_seq_test1,
+
+                   TestLabel "game_scores- test1 " game_scores_test1, 
+                   TestLabel "game_scores- test2 " game_scores_test2, 
+                   TestLabel "game_scores- test3 " game_scores_test3,
+                   
+                   TestLabel "wins_by_year- test1 " game_scores_test1,
+                   TestLabel "wins_by_year- test2 " game_scores_test2
                  ] 
                   
 -- shortcut to run the tests

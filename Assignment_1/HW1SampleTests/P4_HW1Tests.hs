@@ -1,4 +1,6 @@
 {-  To run the tests type "run" at the Haskell prompt.  -} 
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use camelCase" #-}
 
 module P4_HW1tests
     where
@@ -31,7 +33,7 @@ p4a_test3 = TestCase (assertEqual "game_scores-test3"
                                   [] 
                                   (sort $ game_scores wsu_games "YALE") ) 
 
--- wins_by_year tests                                  
+--wins_by_year tests                                  
 p4b_test1 = TestCase (assertEqual "wins_by_year-test1" 
                                   (sort [(2019,6),(2020,1),(2021,7)])  
                                   (sort $ wins_by_year wsu_games) ) 
@@ -40,7 +42,7 @@ p4b_test1 = TestCase (assertEqual "wins_by_year-test1"
 tests = TestList [                                      
                    TestLabel "Problem 4- test1 " p4a_test1, 
                    TestLabel "Problem 4- test2 " p4a_test2,
-                   TestLabel "Problem 4- test3 " p4a_test3, 
+                   TestLabel "Problem 4- test3 " p4a_test3,
                    TestLabel "Problem 4- test4 " p4b_test1
                  ] 
                   
